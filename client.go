@@ -24,13 +24,15 @@ func (c Client) Request(Type string, opt *tool.DoHttpReq) (*http.Response, error
 	return c.Http.Request(Type, opt)
 }
 
-func (c Client) VerifyToken(token string, groups ...string) (*VerifyTokenResponse, error) {
+type RequestVerifyToken struct {
+	Token  string `json:"token"`
+	Groups string `json:"groups,omitempty"`
+}
+
+func (c Client) VerifyToken(req *RequestVerifyToken) (*VerifyTokenResponse, error) {
 	res, e := c.Request("POST", &tool.DoHttpReq{
-		Url: "v1/public/login/verify",
-		Body: map[string]interface{}{
-			"token":  token,
-			"groups": groups,
-		},
+		Url:  "v1/public/login/verify",
+		Body: req,
 	})
 	if e != nil {
 		return nil, e
