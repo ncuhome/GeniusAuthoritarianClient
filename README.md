@@ -3,6 +3,7 @@
 使用：
 
 ```shell
+~$ export GOPRIVATE=github.com/ncuhome
 ~$ go get github.com/ncuhome/GeniusAuthoritarianClient
 ```
 
