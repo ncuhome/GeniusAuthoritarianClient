@@ -30,7 +30,9 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	info, e := GaClient.VerifyToken(f.Token)
+	info, e := GaClient.VerifyToken(&ga.RequestVerifyToken{
+		Token: f.Token,
+    })
 	if e != nil {
 		panic(e)
 		return
@@ -47,5 +49,8 @@ func Login(c *gin.Context) {
 在接口中限制可登录组：
 
 ```go
-GaClient.VerifyToken(f.Token, "中心", "研发")
+GaClient.VerifyToken(&ga.RequestVerifyToken{
+    Token: f.Token,
+    Groups: {"中心", "研发"}
+})
 ```
