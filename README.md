@@ -42,3 +42,9 @@ func Login(c *gin.Context) {
 	fmt.Println(info.Data)
 }
 ```
+
+在接口中限制可登录组：
+
+```go
+GaClient.VerifyToken(f.Token, "中心", "研发")
+```

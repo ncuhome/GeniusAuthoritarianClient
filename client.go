@@ -24,11 +24,12 @@ func (c Client) Request(Type string, opt *tool.DoHttpReq) (*http.Response, error
 	return c.Http.Request(Type, opt)
 }
 
-func (c Client) VerifyToken(token string) (*VerifyTokenResponse, error) {
+func (c Client) VerifyToken(token string, groups ...string) (*VerifyTokenResponse, error) {
 	res, e := c.Request("POST", &tool.DoHttpReq{
 		Url: "v1/public/login/verify",
 		Body: map[string]interface{}{
-			"token": token,
+			"token":  token,
+			"groups": groups,
 		},
 	})
 	if e != nil {
