@@ -38,5 +38,5 @@ func (c Client) VerifyToken(token string, groups ...string) (*VerifyTokenRespons
 	defer res.Body.Close()
 
 	var resp VerifyTokenResponse
-	return &resp, json.NewDecoder(res.Body).Decode(&res)
+	return &resp, json.NewDecoder(res.Body).Decode(&resp)
 }
