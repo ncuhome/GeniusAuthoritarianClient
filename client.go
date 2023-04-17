@@ -25,8 +25,8 @@ func (c Client) Request(Type string, opt *tool.DoHttpReq) (*http.Response, error
 }
 
 type RequestVerifyToken struct {
-	Token  string `json:"token"`
-	Groups string `json:"groups,omitempty"`
+	Token  string   `json:"token"`
+	Groups []string `json:"groups,omitempty"`
 }
 
 func (c Client) VerifyToken(req *RequestVerifyToken) (*VerifyTokenResponse, error) {
