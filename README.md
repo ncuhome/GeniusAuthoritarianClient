@@ -19,7 +19,7 @@ import (
 	"net/http"
 )
 
-var GaClient = ga.NewClient("v.ncuos.com", http.DefaultClient)
+var GaClient = ga.NewClient("v.ncuos.com" ,"your app code", "your app secret", http.DefaultClient)
 
 func Login(c *gin.Context) {
 	var f struct {
@@ -44,13 +44,8 @@ func Login(c *gin.Context) {
 	// 登录成功
 	fmt.Println(info.Data)
 }
-```
 
-在接口中限制可登录组：
-
-```go
-GaClient.VerifyToken(&ga.RequestVerifyToken{
-    Token: f.Token,
-    Groups: {"中心", "研发"}
-})
+func GoLogin(c *gin.Context)  {
+    c.Redirect(302, GaClient.LoginUrl())
+}
 ```
