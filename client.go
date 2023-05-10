@@ -6,6 +6,7 @@ import (
 	"github.com/Mmx233/tool"
 	"github.com/ncuhome/GeniusAuthoritarianClient/pkg/signature"
 	"net/http"
+	"net/url"
 	"time"
 )
 
@@ -64,4 +65,8 @@ func (c Client) VerifyToken(req RequestVerifyToken) (*VerifyTokenResponse, error
 
 	var resp VerifyTokenResponse
 	return &resp, json.NewDecoder(res.Body).Decode(&resp)
+}
+
+func (c Client) LoginUrl(appCode string) string {
+	return fmt.Sprintf("https://%s/?appCode=%s", c.Domain, url.QueryEscape(appCode))
 }
