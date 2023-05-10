@@ -67,6 +67,6 @@ func (c Client) VerifyToken(req RequestVerifyToken) (*VerifyTokenResponse, error
 	return &resp, json.NewDecoder(res.Body).Decode(&resp)
 }
 
-func (c Client) LoginUrl(appCode string) string {
-	return fmt.Sprintf("https://%s/?appCode=%s", c.Domain, url.QueryEscape(appCode))
+func (c Client) LoginUrl() string {
+	return fmt.Sprintf("https://%s/?appCode=%s", c.Domain, url.QueryEscape(c.appCode))
 }
