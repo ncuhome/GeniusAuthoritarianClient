@@ -32,6 +32,7 @@ func Login(c *gin.Context) {
 
 	info, e := GaClient.VerifyToken(&ga.RequestVerifyToken{
 		Token: f.Token,
+		ClientIp: c.ClientIp(),
     })
 	if e != nil {
 		panic(e)

@@ -33,7 +33,8 @@ func (c Client) Request(Type string, opt *tool.DoHttpReq) (*http.Response, error
 }
 
 type RequestVerifyToken struct {
-	Token string `json:"token"`
+	Token    string `json:"token"`
+	ClientIp string `json:"clientIp,omitempty"`
 }
 type reqVerifyToken struct {
 	RequestVerifyToken
