@@ -7,8 +7,9 @@ type Response struct {
 }
 
 type VerifyTokenSuccess struct {
-	Name   string   `json:"name"`
-	Groups []string `json:"groups"`
+	Name      string   `json:"name"`
+	Groups    []string `json:"groups"`
+	AvatarUrl string   `json:"avatarUrl"`
 }
 
 type VerifyTokenResponse struct {
