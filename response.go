@@ -1,7 +1,5 @@
 package geniusAuth
 
-import "encoding/json"
-
 type Response struct {
 	Code uint        `json:"code"`
 	Data interface{} `json:"data"`
@@ -23,8 +21,8 @@ type VerifyTokenResponse struct {
 }
 
 type RefreshTokenData struct {
-	AccessToken string          `json:"access_token"`
-	Payload     json.RawMessage `json:"payload,omitempty"`
+	AccessToken string `json:"access_token"`
+	Payload     string `json:"payload,omitempty"`
 }
 
 type RefreshTokenResponse struct {
@@ -33,8 +31,8 @@ type RefreshTokenResponse struct {
 }
 
 type VerifyAccessTokenData struct {
-	UID     uint            `json:"uid"`
-	Payload json.RawMessage `json:"payload,omitempty"`
+	UID     uint   `json:"uid"`
+	Payload string `json:"payload,omitempty"`
 }
 
 type VerifyAccessTokenResponse struct {
