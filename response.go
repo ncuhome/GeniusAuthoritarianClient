@@ -1,12 +1,12 @@
 package geniusAuth
 
-type Response struct {
+type Response[T any] struct {
 	Code uint        `json:"code"`
 	Data interface{} `json:"data"`
-	Msg  string      `json:"msg"`
+	Msg  T           `json:"msg"`
 }
 
-type VerifyTokenData struct {
+type VerifyToken struct {
 	UserID       uint     `json:"userID"`
 	Name         string   `json:"name"`
 	Groups       []string `json:"groups"`
@@ -15,27 +15,19 @@ type VerifyTokenData struct {
 	AccessToken  string   `json:"accessToken"`
 }
 
-type VerifyTokenResponse struct {
-	Response
-	Data *VerifyTokenData `json:"data"`
-}
-
-type RefreshTokenData struct {
+type RefreshToken struct {
 	AccessToken string `json:"access_token"`
 	Payload     string `json:"payload,omitempty"`
 }
 
-type RefreshTokenResponse struct {
-	Response
-	Data *RefreshTokenData `json:"data"`
-}
-
-type VerifyAccessTokenData struct {
+type VerifyAccessToken struct {
 	UID     uint   `json:"uid"`
 	Payload string `json:"payload,omitempty"`
 }
 
-type VerifyAccessTokenResponse struct {
-	Response
-	Data *VerifyAccessTokenData `json:"data"`
+type UserInfo struct {
+	UserID    uint     `json:"userID"`
+	Name      string   `json:"name"`
+	Groups    []string `json:"groups"`
+	AvatarUrl string   `json:"avatarUrl"`
 }

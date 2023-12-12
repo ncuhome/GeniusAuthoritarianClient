@@ -52,7 +52,7 @@ type RequestVerifyToken struct {
 	Valid   int64  `json:"valid,omitempty"`
 }
 
-func (c Client) VerifyToken(req *RequestVerifyToken) (*VerifyTokenResponse, error) {
+func (c Client) VerifyToken(req *RequestVerifyToken) (*Response[VerifyToken], error) {
 	res, err := c.Request("POST", &DoReq{
 		Url:  "public/login/verify",
 		Body: req,
@@ -62,7 +62,7 @@ func (c Client) VerifyToken(req *RequestVerifyToken) (*VerifyTokenResponse, erro
 	}
 	defer res.Body.Close()
 
-	var resp VerifyTokenResponse
+	var resp Response[VerifyToken]
 	return &resp, json.NewDecoder(res.Body).Decode(&resp)
 }
 
@@ -74,7 +74,7 @@ type RequestRefreshToken struct {
 	Token string `json:"token"`
 }
 
-func (c Client) RefreshToken(req *RequestRefreshToken) (*RefreshTokenResponse, error) {
+func (c Client) RefreshToken(req *RequestRefreshToken) (*Response[RefreshToken], error) {
 	res, err := c.Request("POST", &DoReq{
 		Url:  "public/token/refresh",
 		Body: req,
@@ -84,7 +84,7 @@ func (c Client) RefreshToken(req *RequestRefreshToken) (*RefreshTokenResponse, e
 	}
 	defer res.Body.Close()
 
-	var resp RefreshTokenResponse
+	var resp Response[RefreshToken]
 	return &resp, json.NewDecoder(res.Body).Decode(&resp)
 }
 
@@ -92,7 +92,7 @@ type RequestVerifyAccessToken struct {
 	Token string `json:"token"`
 }
 
-func (c Client) VerifyAccessToken(req *RequestVerifyAccessToken) (*VerifyAccessTokenResponse, error) {
+func (c Client) VerifyAccessToken(req *RequestVerifyAccessToken) (*Response[VerifyAccessToken], error) {
 	res, err := c.Request("POST", &DoReq{
 		Url:  "public/token/access/verify",
 		Body: req,
@@ -102,6 +102,20 @@ func (c Client) VerifyAccessToken(req *RequestVerifyAccessToken) (*VerifyAccessT
 	}
 	defer res.Body.Close()
 
-	var resp VerifyAccessTokenResponse
+	var resp Response[VerifyAccessToken]
+	return &resp, json.NewDecoder(res.Body).Decode(&resp)
+}
+
+func (c Client) GetUserInfo(req *RequestVerifyToken) (*Response[UserInfo], error) {
+	res, err := c.Request("POST", &DoReq{
+		Url:  "public/token/access/user/info",
+		Body: req,
+	})
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	var resp Response[UserInfo]
 	return &resp, json.NewDecoder(res.Body).Decode(&resp)
 }
