@@ -1,9 +1,9 @@
 package geniusAuth
 
 type Response[T any] struct {
-	Code uint        `json:"code"`
-	Data interface{} `json:"data"`
-	Msg  T           `json:"msg"`
+	Code uint   `json:"code"`
+	Data T      `json:"data"`
+	Msg  string `json:"msg"`
 }
 
 type VerifyToken struct {
