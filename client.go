@@ -31,10 +31,10 @@ type Client struct {
 type DoReq struct {
 	Url  string
 	Body interface{}
-	Res  any
 }
 
-func (c Client) Request(Type string, opt *DoReq) error {
+func Request[T any](c Client, Type string, opt *DoReq) (*T, error) {
+	var resp Response[T]
 	res, err := c.Http.Request(Type, &tool.DoHttpReq{
 		Url: fmt.Sprintf("https://%s/api/v1/%s", c.Domain, opt.Url),
 		Header: map[string]interface{}{
@@ -43,11 +43,22 @@ func (c Client) Request(Type string, opt *DoReq) error {
 		Body: c.signHeader.SignMap(opt.Body),
 	})
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer res.Body.Close()
 
-	return json.NewDecoder(res.Body).Decode(opt.Res)
+	err = json.NewDecoder(res.Body).Decode(&resp)
+	if err != nil {
+		return nil, err
+	}
+
+	if resp.Code != 0 {
+		return nil, &ApiErr{
+			Code: resp.Code,
+			Msg:  resp.Msg,
+		}
+	}
+	return &resp.Data, nil
 }
 
 type RequestVerifyToken struct {
@@ -59,12 +70,10 @@ type RequestVerifyToken struct {
 	Valid   int64  `json:"valid,omitempty"`
 }
 
-func (c Client) VerifyToken(req *RequestVerifyToken) (*Response[VerifyToken], error) {
-	var resp Response[VerifyToken]
-	return &resp, c.Request("POST", &DoReq{
+func (c Client) VerifyToken(req *RequestVerifyToken) (*VerifyToken, error) {
+	return Request[VerifyToken](c, "POST", &DoReq{
 		Url:  "public/login/verify",
 		Body: req,
-		Res:  &resp,
 	})
 }
 
@@ -76,12 +85,10 @@ type RequestRefreshToken struct {
 	Token string `json:"token"`
 }
 
-func (c Client) RefreshToken(req *RequestRefreshToken) (*Response[RefreshToken], error) {
-	var resp Response[RefreshToken]
-	return &resp, c.Request("POST", &DoReq{
+func (c Client) RefreshToken(req *RequestRefreshToken) (*RefreshToken, error) {
+	return Request[RefreshToken](c, "POST", &DoReq{
 		Url:  "public/token/refresh",
 		Body: req,
-		Res:  &resp,
 	})
 }
 
@@ -91,12 +98,10 @@ type RequestModifyPayload struct {
 	AccessToken bool   `json:"accessToken"`
 }
 
-func (c Client) ModifyPayload(req *RequestModifyPayload) (*Response[Tokens], error) {
-	var resp Response[Tokens]
-	return &resp, c.Request("PATCH", &DoReq{
+func (c Client) ModifyPayload(req *RequestModifyPayload) (*Tokens, error) {
+	return Request[Tokens](c, "PATCH", &DoReq{
 		Url:  "public/token/refresh",
 		Body: req,
-		Res:  &resp,
 	})
 }
 
@@ -104,20 +109,16 @@ type RequestVerifyAccessToken struct {
 	Token string `json:"token"`
 }
 
-func (c Client) VerifyAccessToken(req *RequestVerifyAccessToken) (*Response[VerifyAccessToken], error) {
-	var resp Response[VerifyAccessToken]
-	return &resp, c.Request("POST", &DoReq{
+func (c Client) VerifyAccessToken(req *RequestVerifyAccessToken) (*VerifyAccessToken, error) {
+	return Request[VerifyAccessToken](c, "POST", &DoReq{
 		Url:  "public/token/access/verify",
 		Body: req,
-		Res:  &resp,
 	})
 }
 
-func (c Client) GetUserInfo(req *RequestVerifyToken) (*Response[UserInfo], error) {
-	var resp Response[UserInfo]
-	return &resp, c.Request("POST", &DoReq{
+func (c Client) GetUserInfo(req *RequestVerifyToken) (*UserInfo, error) {
+	return Request[UserInfo](c, "POST", &DoReq{
 		Url:  "public/token/access/user/info",
 		Body: req,
-		Res:  &resp,
 	})
 }
