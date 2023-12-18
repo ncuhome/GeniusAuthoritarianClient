@@ -31,3 +31,8 @@ type UserInfo struct {
 	Groups    []string `json:"groups"`
 	AvatarUrl string   `json:"avatarUrl"`
 }
+
+type Tokens struct {
+	RefreshToken string `json:"refreshToken"`
+	AccessToken  string `json:"accessToken,omitempty"`
+}

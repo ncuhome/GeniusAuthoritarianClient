@@ -85,6 +85,21 @@ func (c Client) RefreshToken(req *RequestRefreshToken) (*Response[RefreshToken],
 	})
 }
 
+type RequestModifyPayload struct {
+	Token       string `json:"token"`
+	Payload     string `json:"payload"`
+	AccessToken bool   `json:"accessToken"`
+}
+
+func (c Client) ModifyPayload(req *RequestModifyPayload) (*Response[Tokens], error) {
+	var resp Response[Tokens]
+	return &resp, c.Request("PATCH", &DoReq{
+		Url:  "public/token/refresh",
+		Body: req,
+		Res:  &resp,
+	})
+}
+
 type RequestVerifyAccessToken struct {
 	Token string `json:"token"`
 }
