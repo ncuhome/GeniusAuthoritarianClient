@@ -12,6 +12,7 @@
 package controllers
 
 import (
+	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
 	ga "github.com/ncuhome/GeniusAuthoritarianClient"
@@ -34,17 +35,26 @@ func Login(c *gin.Context) {
 	info, err := GaClient.VerifyToken(&ga.RequestVerifyToken{
 		Token: f.Token,
 		ClientIp: c.ClientIp(),
+		GrantType: "refresh_token",
+		Payload: "example",
+		Valid: (time.Hour*24*7).Seconds(),
 	})
 	if err != nil {
-		panic(err)
-		return
-	} else if info.Code != 0 {
-		panic(info.Msg)
+		var apiErr *ga.ApiErr
+		if errors.As(err, &apiErr) {
+			fmt.Println(apiErr.Code, apiErr.Msg)
+			if apiErr.Code == 5 {
+				c.AbortWithStatus(401)
+				return
+			}
+		}
+		// 网络错误、GA 内部错误或表单参数异常
+		c.AbortWithStatus(500)
 		return
 	}
 
 	// 登录成功
-	fmt.Println(info.Data)
+	fmt.Println(info)
 }
 
 // GoLogin 跳转到 GeniusAuth 登录
