@@ -36,3 +36,15 @@ type Tokens struct {
 	RefreshToken string `json:"refreshToken"`
 	AccessToken  string `json:"accessToken,omitempty"`
 }
+
+type Group struct {
+	ID   uint   `json:"id"`
+	Name string `json:"name"`
+}
+
+type UserPublicInfo struct {
+	ID        uint    `json:"id"`
+	Name      string  `json:"name"`
+	AvatarUrl string  `json:"avatar_url"`
+	Groups    []Group `json:"groups"`
+}

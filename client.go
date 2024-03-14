@@ -7,6 +7,8 @@ import (
 	"github.com/ncuhome/GeniusAuthoritarianClient/signature"
 	"net/http"
 	"net/url"
+	"strconv"
+	"strings"
 )
 
 func NewClient(domain, appCode, appSecret string, httpClient *http.Client) *Client {
@@ -30,18 +32,25 @@ type Client struct {
 
 type DoReq struct {
 	Url  string
-	Body interface{}
+	Form interface{}
 }
 
 func Request[T any](c Client, Type string, opt *DoReq) (*T, error) {
-	var resp Response[T]
-	res, err := c.Http.Request(Type, &tool.DoHttpReq{
+	req := &tool.DoHttpReq{
 		Url: fmt.Sprintf("https://%s/api/v1/%s", c.Domain, opt.Url),
 		Header: map[string]interface{}{
 			"Content-Type": "application/json",
 		},
-		Body: c.signHeader.SignMap(opt.Body),
-	})
+	}
+	signedMap := c.signHeader.SignMap(opt.Form)
+	if Type == "GET" {
+		req.Query = signedMap
+	} else {
+		req.Body = signedMap
+	}
+
+	var resp Response[T]
+	res, err := c.Http.Request(Type, req)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +82,7 @@ type RequestVerifyToken struct {
 func (c Client) VerifyToken(req *RequestVerifyToken) (*VerifyToken, error) {
 	return Request[VerifyToken](c, "POST", &DoReq{
 		Url:  "public/login/verify",
-		Body: req,
+		Form: req,
 	})
 }
 
@@ -88,7 +97,7 @@ type RequestRefreshToken struct {
 func (c Client) RefreshToken(req *RequestRefreshToken) (*RefreshToken, error) {
 	return Request[RefreshToken](c, "POST", &DoReq{
 		Url:  "public/token/refresh",
-		Body: req,
+		Form: req,
 	})
 }
 
@@ -101,7 +110,7 @@ type RequestModifyPayload struct {
 func (c Client) ModifyPayload(req *RequestModifyPayload) (*Tokens, error) {
 	return Request[Tokens](c, "PATCH", &DoReq{
 		Url:  "public/token/refresh",
-		Body: req,
+		Form: req,
 	})
 }
 
@@ -112,13 +121,34 @@ type RequestVerifyAccessToken struct {
 func (c Client) VerifyAccessToken(req *RequestVerifyAccessToken) (*VerifyAccessToken, error) {
 	return Request[VerifyAccessToken](c, "POST", &DoReq{
 		Url:  "public/token/access/verify",
-		Body: req,
+		Form: req,
 	})
 }
 
 func (c Client) GetUserInfo(req *RequestVerifyToken) (*UserInfo, error) {
 	return Request[UserInfo](c, "POST", &DoReq{
 		Url:  "public/token/access/user/info",
-		Body: req,
+		Form: req,
 	})
+}
+
+type RequestGetUserPublicInfo struct {
+	ID string `json:"id"`
+}
+
+func (c Client) GetUserPublicInfo(uid ...uint) ([]UserPublicInfo, error) {
+	idStrArr := make([]string, len(uid))
+	for i, id := range uid {
+		idStrArr[i] = strconv.FormatUint(uint64(id), 10)
+	}
+	resp, err := Request[[]UserPublicInfo](c, "GET", &DoReq{
+		Url: "public/user/info",
+		Form: &RequestGetUserPublicInfo{
+			ID: strings.Join(idStrArr, ","),
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+	return *resp, nil
 }
