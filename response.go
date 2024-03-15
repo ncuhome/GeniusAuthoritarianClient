@@ -45,6 +45,6 @@ type Group struct {
 type UserPublicInfo struct {
 	ID        uint    `json:"id"`
 	Name      string  `json:"name"`
-	AvatarUrl string  `json:"avatar_url"`
+	AvatarUrl string  `json:"avatarUrl"`
 	Groups    []Group `json:"groups"`
 }
