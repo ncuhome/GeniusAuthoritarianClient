@@ -13,8 +13,9 @@ import (
 
 func NewClient(domain, appCode, appSecret string, httpClient *http.Client) *Client {
 	return &Client{
-		Http:   tool.NewHttpTool(httpClient),
-		Domain: domain,
+		Http:    tool.NewHttpTool(httpClient),
+		Domain:  domain,
+		AppCode: appCode,
 
 		signHeader: &signature.SignHeader{
 			AppCode:   appCode,
@@ -24,8 +25,10 @@ func NewClient(domain, appCode, appSecret string, httpClient *http.Client) *Clie
 }
 
 type Client struct {
-	Http   *tool.Http
-	Domain string
+	Http *tool.Http
+
+	Domain  string
+	AppCode string
 
 	signHeader *signature.SignHeader
 }
