@@ -15,17 +15,22 @@ type SignHeader struct {
 }
 
 func (s SignHeader) SignMap(body any) map[string]interface{} {
-	v := reflect.ValueOf(body).Elem()
-	t := v.Type()
-	num := t.NumField()
-	bodyMap := make(map[string]interface{}, num+3)
-	for i := 0; i < num; i++ {
-		tagStr := t.Field(i).Tag.Get("json")
-		tags := strings.Split(tagStr, ",")
-		if len(tags) >= 2 && tags[1] == "omitempty" && v.Field(i).IsZero() {
-			continue
+	var bodyMap map[string]interface{}
+	if body != nil {
+		v := reflect.ValueOf(body).Elem()
+		t := v.Type()
+		num := t.NumField()
+		bodyMap = make(map[string]interface{}, num+3)
+		for i := 0; i < num; i++ {
+			tagStr := t.Field(i).Tag.Get("json")
+			tags := strings.Split(tagStr, ",")
+			if len(tags) >= 2 && tags[1] == "omitempty" && v.Field(i).IsZero() {
+				continue
+			}
+			bodyMap[tags[0]] = v.Field(i).Interface()
 		}
-		bodyMap[tags[0]] = v.Field(i).Interface()
+	} else {
+		bodyMap = make(map[string]interface{}, 3)
 	}
 
 	unix := time.Now().Unix()
