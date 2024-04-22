@@ -152,3 +152,15 @@ func (c Client) GetUserPublicInfo(uid ...uint) ([]UserPublicInfo, error) {
 	}
 	return *resp, nil
 }
+
+func (c Client) GetServerPublicKeys() (*ServerPublicKeys, error) {
+	return Request[ServerPublicKeys](c, "GET", &DoReq{
+		Url: "app/keypair/server",
+	})
+}
+
+func (c Client) CreateRpcClientCredential() (*RpcClientCredential, error) {
+	return Request[RpcClientCredential](c, "POST", &DoReq{
+		Url: "app/keypair/rpc",
+	})
+}

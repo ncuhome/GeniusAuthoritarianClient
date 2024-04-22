@@ -48,3 +48,14 @@ type UserPublicInfo struct {
 	AvatarUrl string  `json:"avatarUrl"`
 	Groups    []Group `json:"groups"`
 }
+
+type ServerPublicKeys struct {
+	Jwt []byte `json:"jwt"`
+	Ca  []byte `json:"ca"`
+}
+
+type RpcClientCredential struct {
+	Cert        []byte `json:"cert"`        // pem format
+	Key         []byte `json:"key"`         // pem format
+	ValidBefore int64  `json:"validBefore"` // second
+}
