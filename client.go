@@ -96,7 +96,7 @@ type RequestRefreshToken struct {
 
 func (c Client) RefreshToken(req *RequestRefreshToken) (*RefreshToken, error) {
 	return Request[RefreshToken](c, "POST", &DoReq{
-		Url:  "public/token/refresh",
+		Url:  "app/token/refresh",
 		Form: req,
 	})
 }
@@ -109,7 +109,7 @@ type RequestModifyPayload struct {
 
 func (c Client) ModifyPayload(req *RequestModifyPayload) (*Tokens, error) {
 	return Request[Tokens](c, "PATCH", &DoReq{
-		Url:  "public/token/refresh",
+		Url:  "app/token/refresh",
 		Form: req,
 	})
 }
@@ -120,14 +120,14 @@ type RequestVerifyAccessToken struct {
 
 func (c Client) VerifyAccessToken(req *RequestVerifyAccessToken) (*VerifyAccessToken, error) {
 	return Request[VerifyAccessToken](c, "POST", &DoReq{
-		Url:  "public/token/access/verify",
+		Url:  "app/token/access/verify",
 		Form: req,
 	})
 }
 
 func (c Client) GetUserInfo(req *RequestVerifyToken) (*UserInfo, error) {
 	return Request[UserInfo](c, "POST", &DoReq{
-		Url:  "public/token/access/user/info",
+		Url:  "app/token/access/user/info",
 		Form: req,
 	})
 }
@@ -142,7 +142,7 @@ func (c Client) GetUserPublicInfo(uid ...uint) ([]UserPublicInfo, error) {
 		idStrArr[i] = strconv.FormatUint(uint64(id), 10)
 	}
 	resp, err := Request[[]UserPublicInfo](c, "GET", &DoReq{
-		Url: "public/user/info",
+		Url: "app/user/info",
 		Form: &RequestGetUserPublicInfo{
 			ID: strings.Join(idStrArr, ","),
 		},
