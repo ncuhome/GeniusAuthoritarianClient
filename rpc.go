@@ -12,17 +12,12 @@ import (
 	"time"
 )
 
-type RpcConfig struct {
-	// Production server need to use valid cert, enable this in local development
-	TrustSelfSignedCa bool
-}
-
-func (c Client) NewRpcClient(addr string, opt *RpcConfig) (*RpcClient, error) {
+func (c Client) NewRpcClient(addr string) (*RpcClient, error) {
 	client := RpcClient{
 		api:  &c,
 		addr: addr,
 	}
-	return &client, client.initConnection(opt)
+	return &client, client.initConnection()
 }
 
 type RpcClient struct {
@@ -67,27 +62,21 @@ func (rpc *RpcClient) loadKeypair() (*tls.Certificate, *RpcClientCredential, err
 	return rpc.keypair.Cert, rpc.keypair.Cred, nil
 }
 
-func (rpc *RpcClient) initConnection(opt *RpcConfig) error {
-	if opt == nil {
-		opt = &RpcConfig{}
+func (rpc *RpcClient) initConnection() error {
+	pubKeys, err := rpc.api.GetServerPublicKeys()
+	if err != nil {
+		return err
 	}
-	var caPool *x509.CertPool
-	if opt.TrustSelfSignedCa {
-		pubKeys, err := rpc.api.GetServerPublicKeys()
-		if err != nil {
-			return err
-		}
-		block, _ := pem.Decode(pubKeys.Ca)
-		if block == nil || block.Type != "CERTIFICATE" {
-			return errors.New("decode server ca cert failed")
-		}
-		caCert, err := x509.ParseCertificate(block.Bytes)
-		if err != nil {
-			return err
-		}
-		caPool = x509.NewCertPool()
-		caPool.AddCert(caCert)
+	block, _ := pem.Decode(pubKeys.Ca)
+	if block == nil || block.Type != "CERTIFICATE" {
+		return errors.New("decode server ca cert failed")
 	}
+	caCert, err := x509.ParseCertificate(block.Bytes)
+	if err != nil {
+		return err
+	}
+	caPool := x509.NewCertPool()
+	caPool.AddCert(caCert)
 
 	conn, err := grpc.Dial(rpc.addr, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{
 		GetClientCertificate: func(info *tls.CertificateRequestInfo) (*tls.Certificate, error) {
