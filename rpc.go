@@ -25,7 +25,7 @@ type RpcClient struct {
 
 	addr    string
 	keypair RpcClientKeypair
-	Client  appProto.AppClient
+	appProto.AppClient
 }
 
 type RpcClientKeypair struct {
@@ -88,6 +88,6 @@ func (rpc *RpcClient) initConnection() error {
 	if err != nil {
 		return err
 	}
-	rpc.Client = appProto.NewAppClient(conn)
+	rpc.AppClient = appProto.NewAppClient(conn)
 	return nil
 }
