@@ -64,7 +64,11 @@ func (p *RpcJwtParser) _RpcStream() {
 				break
 			}
 			for _, userOperation := range msg.UserOperation {
-				p.UserOperationIDTable.Store(userOperation.Uid, userOperation.OperationId)
+				if userOperation.OperationId == 0 {
+					p.UserOperationIDTable.Delete(userOperation.Uid)
+				} else {
+					p.UserOperationIDTable.Store(userOperation.Uid, userOperation.OperationId)
+				}
 			}
 			for _, canceledToken := range msg.CanceledToken {
 				p.CanceledTokenTable.Store(canceledToken.Id, time.Unix(canceledToken.ValidBefore, 0))
