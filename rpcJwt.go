@@ -38,6 +38,7 @@ func (p *RpcJwtParser) init() error {
 	}
 	go p._RpcStream()
 	go p._TableClean()
+
 	return nil
 }
 
@@ -46,8 +47,10 @@ func (p *RpcJwtParser) _RpcStream() {
 	defer cancel()
 
 	for {
-		srv, err := p.Rpc.WatchTokenOperation(ctx, &emptypb.Empty{})
+		rpcCtx, rpcCancel := context.WithCancel(ctx)
+		srv, err := p.Rpc.WatchTokenOperation(rpcCtx, &emptypb.Empty{})
 		if err != nil {
+			rpcCancel()
 			p.OnError(err)
 			time.Sleep(time.Second * 5)
 			continue
@@ -68,6 +71,7 @@ func (p *RpcJwtParser) _RpcStream() {
 			}
 		}
 		p.Connected.Store(false)
+		rpcCancel()
 	}
 }
 
