@@ -8,7 +8,7 @@ type Claims interface {
 }
 type ClaimsUser interface {
 	Claims
-	GetUID() uint
+	GetUID() uint64
 	GetUserOperateID() uint64
 }
 
@@ -25,11 +25,11 @@ func (c TypedClaims) GetType() string {
 type UserClaims struct {
 	TypedClaims
 	// 用户 ID
-	UID           uint   `json:"uid"`
+	UID           uint64 `json:"uid"`
 	UserOperateID uint64 `json:"oid"`
 }
 
-func (u UserClaims) GetUID() uint {
+func (u UserClaims) GetUID() uint64 {
 	return u.UID
 }
 

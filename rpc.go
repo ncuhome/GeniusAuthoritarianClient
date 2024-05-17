@@ -1,10 +1,13 @@
 package geniusAuth
 
 import (
+	"crypto"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
 	"errors"
+	"fmt"
+	"github.com/ncuhome/GeniusAuthoritarianClient/jwt"
 	"github.com/ncuhome/GeniusAuthoritarianClient/rpc/appProto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
@@ -25,6 +28,7 @@ type RpcClient struct {
 
 	addr    string
 	keypair RpcClientKeypair
+	conn    *grpc.ClientConn
 	appProto.AppClient
 }
 
@@ -78,7 +82,7 @@ func (rpc *RpcClient) initConnection() error {
 	caPool := x509.NewCertPool()
 	caPool.AddCert(caCert)
 
-	conn, err := grpc.Dial(rpc.addr, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{
+	rpc.conn, err = grpc.Dial(rpc.addr, grpc.WithTransportCredentials(credentials.NewTLS(&tls.Config{
 		GetClientCertificate: func(info *tls.CertificateRequestInfo) (*tls.Certificate, error) {
 			cert, _, err := rpc.loadKeypair()
 			return cert, err
@@ -88,6 +92,35 @@ func (rpc *RpcClient) initConnection() error {
 	if err != nil {
 		return err
 	}
-	rpc.AppClient = appProto.NewAppClient(conn)
+	rpc.AppClient = appProto.NewAppClient(rpc.conn)
 	return nil
+}
+
+func (rpc *RpcClient) Close() error {
+	return rpc.conn.Close()
+}
+
+func (rpc *RpcClient) NewJwtParser() (*RpcJwtParser, error) {
+	pubKeys, err := rpc.api.GetServerPublicKeys()
+	if err != nil {
+		return nil, fmt.Errorf("get server jwt public key failed:: %v", err)
+	}
+
+	publicKey, err := x509.ParsePKIXPublicKey(pubKeys.Jwt)
+	if err != nil {
+		return nil, fmt.Errorf("parse public key failed: %v", err)
+	}
+
+	pub, ok := publicKey.(crypto.PublicKey)
+	if !ok {
+		return nil, fmt.Errorf("jwt public key format error")
+	}
+
+	parser := &RpcJwtParser{
+		Rpc: rpc,
+		Jwt: &jwt.Parser{
+			PublicKey: pub,
+		},
+	}
+	return parser, parser.init()
 }
