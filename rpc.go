@@ -103,10 +103,14 @@ func (rpc *RpcClient) Close() error {
 func (rpc *RpcClient) NewJwtParser() (*RpcJwtParser, error) {
 	pubKeys, err := rpc.api.GetServerPublicKeys()
 	if err != nil {
-		return nil, fmt.Errorf("get server jwt public key failed:: %v", err)
+		return nil, fmt.Errorf("get server jwt public key failed: %v", err)
 	}
 
-	publicKey, err := x509.ParsePKIXPublicKey(pubKeys.Jwt)
+	block, _ := pem.Decode(pubKeys.Jwt)
+	if block == nil {
+		return nil, fmt.Errorf("parse jwt publick key block failed")
+	}
+	publicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
 	if err != nil {
 		return nil, fmt.Errorf("parse public key failed: %v", err)
 	}
