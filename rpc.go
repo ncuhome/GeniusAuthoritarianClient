@@ -17,14 +17,14 @@ import (
 
 func (c Client) NewRpcClient(addr string) (*RpcClient, error) {
 	client := RpcClient{
-		api:  &c,
+		Api:  &c,
 		addr: addr,
 	}
 	return &client, client.initConnection()
 }
 
 type RpcClient struct {
-	api *Client
+	Api *Client
 
 	addr    string
 	keypair RpcClientKeypair
@@ -53,7 +53,7 @@ func (rpc *RpcClient) loadKeypair() (*tls.Certificate, *RpcClientCredential, err
 	rpc.keypair.Lock()
 	defer rpc.keypair.Unlock()
 	if !rpc.keypair.Valid() {
-		cred, err := rpc.api.CreateRpcClientCredential()
+		cred, err := rpc.Api.CreateRpcClientCredential()
 		if err != nil {
 			return nil, nil, err
 		}
@@ -67,7 +67,7 @@ func (rpc *RpcClient) loadKeypair() (*tls.Certificate, *RpcClientCredential, err
 }
 
 func (rpc *RpcClient) initConnection() error {
-	pubKeys, err := rpc.api.GetServerPublicKeys()
+	pubKeys, err := rpc.Api.GetServerPublicKeys()
 	if err != nil {
 		return err
 	}
@@ -101,7 +101,7 @@ func (rpc *RpcClient) Close() error {
 }
 
 func (rpc *RpcClient) NewJwtParser() (*RpcJwtParser, error) {
-	pubKeys, err := rpc.api.GetServerPublicKeys()
+	pubKeys, err := rpc.Api.GetServerPublicKeys()
 	if err != nil {
 		return nil, fmt.Errorf("get server jwt public key failed: %v", err)
 	}

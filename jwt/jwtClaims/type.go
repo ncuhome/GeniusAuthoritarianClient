@@ -11,6 +11,11 @@ type ClaimsUser interface {
 	GetUID() uint64
 	GetUserOperateID() uint64
 }
+type ClaimsStandard interface {
+	ClaimsUser
+	GetID() uint64
+	GetAppCode() string
+}
 
 // TypedClaims type 字段用于区分不同类型的 token，防止类型窜用导致的安全漏洞
 type TypedClaims struct {

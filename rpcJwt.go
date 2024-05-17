@@ -93,19 +93,23 @@ func (p *RpcJwtParser) _TableClean() {
 	}
 }
 
-func (p *RpcJwtParser) TokenStatCheck(uid, userOperationID, tokenID uint64) error {
+func (p *RpcJwtParser) TokenStatCheck(claims jwtClaims.ClaimsStandard) error {
+	if claims.GetAppCode() != p.Rpc.Api.AppCode {
+		return RpcJwtTokenInvalid
+	}
+
 	if !p.Connected.Load() {
 		return RpcJwtNotConnected
 	}
 
-	currentUserOperationID, ok := p.UserOperationIDTable.Load(uid)
+	currentUserOperationID, ok := p.UserOperationIDTable.Load(claims.GetUID())
 	if !ok {
 		return RpcJwtUserOperationIDNotFound
-	} else if currentUserOperationID != userOperationID {
+	} else if currentUserOperationID != claims.GetUserOperateID() {
 		return RpcJwtTokenInvalid
 	}
 
-	_, ok = p.CanceledTokenTable.Load(tokenID)
+	_, ok = p.CanceledTokenTable.Load(claims.GetID())
 	if ok {
 		return RpcJwtTokenInvalid
 	}
@@ -115,16 +119,16 @@ func (p *RpcJwtParser) TokenStatCheck(uid, userOperationID, tokenID uint64) erro
 
 func (p *RpcJwtParser) ParseRefreshToken(token string) (*jwtClaims.RefreshToken, bool, error) {
 	claims, valid, err := p.Jwt.ParseRefreshToken(token)
-	if err != nil {
+	if err != nil || !valid {
 		return claims, valid, err
 	}
-	return claims, valid, p.TokenStatCheck(claims.UID, claims.UserOperateID, claims.ID)
+	return claims, valid, p.TokenStatCheck(claims)
 }
 
 func (p *RpcJwtParser) ParseAccessToken(token string) (*jwtClaims.AccessToken, bool, error) {
 	claims, valid, err := p.Jwt.ParseAccessToken(token)
-	if err != nil {
+	if err != nil || !valid {
 		return claims, valid, err
 	}
-	return claims, valid, p.TokenStatCheck(claims.UID, claims.UserOperateID, claims.ID)
+	return claims, valid, p.TokenStatCheck(claims)
 }
